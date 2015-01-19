@@ -1,3 +1,5 @@
+% this implement a cross-correlation function that cross correlates inLong
+% and in Short with a correlation step of "corrstep"
 function out = myXCorr(inLong, inShort, corrstep, corrlen)
 
 lenLong = length(inLong);
@@ -13,7 +15,7 @@ for i = 1:corrstep:lenLong
         longidx = i+j-1;
         shortidx = j;
         if longidx <= lenLong
-            sum = sum + inLong(i+j-1)*inShort(shortidx);
+            sum = sum + inLong(longidx)*inShort(shortidx);
         end
     end
     out(outidx) = sum;
