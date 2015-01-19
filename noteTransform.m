@@ -2,20 +2,28 @@ audioroot = '..\AudioSamples';
 noteroot = '..\NoteSamples';
 DSR = 4;
 
-audio = 'basssong-2.mp3';
+audio = 'putongpengyou.mp3';
 audiopath = [audioroot '\' audio];
 [input, fssong] = audioread(audiopath);
 input = toMono(input);
 [input, fssong] = myDownsample(input, DSR, fssong);
 
-% 1 2  3 4  5 6 7  8 9  10 11 12
-% C C# D D# E F F# G G# A  A#  B
-notenames = {'E1','F1','F#1','G1','G#1','A1','A#1','B1',...
-    'C2','C#2','D2','D#2','E2','F2','F#2','G2','G#2','A2','A#2','B2',...
+% notenames = {'E1','F1','F#1','G1','G#1','A1','A#1','B1',...
+%     'C2','C#2','D2','D#2','E2','F2','F#2','G2','G#2','A2','A#2','B2',...
+%     'C3'};
+
+notenames = {'C2','C#2','D2','D#2','E2','F2','F#2','G2','G#2','A2','A#2','B2',...
     'C3'};
-N = 50;
+
+% notenames = {'A1','A#1','B1',...
+%     'C2','C#2','D2','D#2','E2','F2','F#2','G2','G#2','A2','A#2','B2',...
+%     'C3'};
+
+basscomp = -1;
+
+N = 100;
 len = length(notenames);
-corrstep = 50;
+corrstep = 100;
 corrlen = floor(length(input)/corrstep);
 corrout = zeros(len, corrlen);
 for i = 1:1:len
@@ -64,28 +72,32 @@ xx = ((1:corrlen)/fssong)*corrstep;
 plot(xx, filteredtransout);
 set(gca, 'YTick',1:21, 'YTickLabel', notenames);
 
-% basslog = '';
-% durationlog = [];
-% previousbass = filteredtransout(1);
-% previoustime = 0;
-% basslog = [basslog num2notename(previousbass) ' ' '0' ' '];
-% for i = 2:1:corrlen
-%     currentbass = filteredtransout(i);
-%     if i == corrlen
-%         currenttime = xx(i);
-%         durationlog = [durationlog currenttime-previoustime];
-%         previoustime = currenttime;
-%         basslog = [basslog num2str(currenttime) '|'];
-%     end
-%     if currentbass ~= previousbass
-%         currenttime = xx(i);
-%         durationlog = [durationlog currenttime-previoustime];
-%         previoustime = currenttime;
-%         basslog = [basslog num2str(currenttime) '|'];
-%         basslog = [basslog num2notename(currentbass) ' ' num2str(currenttime) ' '];
-%     end
-%     previousbass = currentbass;
-% end
-% bonus feature;
-% bartempo = 60 / median(durationlog);
+durationlog = [];
+previousbass = filteredtransout(1);
+previoustime = 0;
+f = fopen([audio '.log'], 'w');
+basslog = [num2notename(mod(previousbass+basscomp,12)) ' ' '0' ' '];
+fprintf(f, '%s',basslog);
+for i = 2:1:corrlen
+    currentbass = filteredtransout(i);
+    if i == corrlen
+        currenttime = xx(i);
+        durationlog = [durationlog currenttime-previoustime];
+        previoustime = currenttime;
+        basslog = [num2str(floor(currenttime/60)) '.' num2str(mod(currenttime,60))];
+        fprintf(f, '%s',basslog);
+    end
+    
+    if num2notename(mod(currentbass+basscomp,12)) ~= num2notename(mod(previousbass+basscomp,12))
+        currenttime = xx(i);
+        durationlog = [durationlog currenttime-previoustime];
+        previoustime = currenttime;
+        basslog = [num2str(floor(currenttime/60)) '.' num2str(mod(currenttime,60))];
+        fprintf(f, '%s\r\n',basslog);
+        basslog = [num2notename(mod(currentbass+basscomp, 12)) ' ' [num2str(floor(currenttime/60)) '.' num2str(mod(currenttime,60))] ' '];
+        fprintf(f, '%s',basslog);
+    end
+    previousbass = currentbass;
+end
 
+fclose(f);
