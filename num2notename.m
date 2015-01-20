@@ -1,28 +1,28 @@
 function notename = num2notename(num)
 
 switch num
-    case 0
-        notename = 'C';
     case 1
-        notename = 'C#';
+        notename = 'C';
     case 2
-        notename = 'D';
+        notename = 'C#';
     case 3
-        notename = 'D#';
+        notename = 'D';
     case 4
-        notename = 'E';
+        notename = 'D#';
     case 5
-        notename = 'F';
+        notename = 'E';
     case 6
-        notename = 'F#';
+        notename = 'F';
     case 7
-        notename = 'G';
+        notename = 'F#';
     case 8
-        notename = 'G#';
+        notename = 'G';
     case 9
-        notename = 'A';
+        notename = 'G#';
     case 10
-        notename = 'A#';
+        notename = 'A';
     case 11
+        notename = 'A#';
+    case 0
         notename = 'B';
 end
